@@ -77,6 +77,16 @@ contains
     
     integer, intent(in) :: n_itr
     real(kind=8), intent(inout), dimension(n_itr) :: means
+
+    integer :: itr,cnt
+
+    cnt=0
+    do itr=1,n_itr
+      if (simulate_pi()) then
+        cnt=cnt+1
+      end if
+      means(itr)=4*real(cnt)/itr
+    end do
     
   end subroutine approximate_pi
 
