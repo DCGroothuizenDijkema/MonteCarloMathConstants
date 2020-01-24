@@ -25,7 +25,7 @@ except OSError as err:
   if err.errno != errno.EEXIST:
     raise
 
-def run(constant):
+def run(constant,display_name):
   if constant=='e':
     func=approximate_e
   elif constant=='pi':
@@ -49,6 +49,10 @@ def run(constant):
   show_fig=False
   verbose=True
 
+  # get figure and axis to plot on
+  _,ax=setup_simulation_plot(x_lim=(1,num_itr),title=r'Approximating {} with Monte Carlo simulations'.format(display_name)
+    ,x_label='Iteration',y_label=r'Estimate of {}'.format(display_name))
+
 if __name__=='__main__':
-  run('e')
-  # run('pi')
+  run('e','Euler\'s Number')
+  # run('pi',r'$\pi$')
