@@ -29,6 +29,12 @@ contains
 
   end function simulate_e
 
+  function simulate_pi() result(within)
+
+    logical :: within
+
+  end function simulate_pi
+
   subroutine approximate_e(n_itr,means)
     !DEC$ ATTRIBUTES DLLEXPORT :: approximate_e
     !DEC$ ATTRIBUTES C :: approximate_e
@@ -52,5 +58,14 @@ contains
     end do
 
   end subroutine approximate_e
+
+  subroutine approximate_pi(n_itr,means)
+    !DEC$ ATTRIBUTES DLLEXPORT :: approximate_e
+    !DEC$ ATTRIBUTES C :: approximate_e
+    
+    integer, intent(in) :: n_itr
+    real(kind=8), intent(inout), dimension(n_itr) :: means
+
+  end subroutine approximate_pi
 
 end module monte_carlo
