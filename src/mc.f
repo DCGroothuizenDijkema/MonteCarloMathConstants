@@ -33,6 +33,18 @@ contains
 
     logical :: within
 
+    real(kind=8) :: distance
+    real(kind=8), dimension(2) :: point
+
+    call RANDOM_NUMBER(point)
+    distance=point(1)**2+point(2)**2
+
+    if (distance.LE.1) then
+      within=.TRUE.
+    else
+      within=.FALSE.
+    end if
+
   end function simulate_pi
 
   subroutine approximate_e(n_itr,means)
@@ -65,7 +77,7 @@ contains
     
     integer, intent(in) :: n_itr
     real(kind=8), intent(inout), dimension(n_itr) :: means
-
+    
   end subroutine approximate_pi
 
 end module monte_carlo
