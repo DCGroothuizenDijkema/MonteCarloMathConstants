@@ -85,4 +85,5 @@ def run(constant,display_name,actual_value,save_name=None):
 
 if __name__=='__main__':
   run('e','Euler\'s Number',np.e)
-  # run('pi',r'$\pi$',np.pi,'pi1')
+  run('pi',r'$\pi$',np.pi)
+  
