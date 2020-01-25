@@ -25,23 +25,27 @@ except OSError as err:
   if err.errno != errno.EEXIST:
     raise
 
-def run(constant,display_name,actual_value):
+def run(constant,display_name,actual_value,save_name=None):
   if constant=='e':
     func=approximate_e
+    y_lim=(2,3.8)
   elif constant=='pi':
     func=approximate_pi
+    y_lim=(1.8,4.2)
   else:
     raise ValueError('Functions only exist to approximate e and pi.')
 
   # constants
   num_itr=1000000
-  num_runs=150
+  num_runs=200
   run_size=10
 
   assert num_runs%run_size==0, "`num_runs` is not a multiple of `run_size`"
 
   # output
-  plot_name='{}.png'.format(constant)
+  if save_name is None:
+    save_name=constant
+  plot_name='{}.png'.format(save_name)
   image_res=1200
 
   # control
@@ -50,7 +54,7 @@ def run(constant,display_name,actual_value):
   verbose=True
 
   # get figure and axis to plot on
-  _,ax=setup_simulation_plot(x_lim=(1,num_itr),title=r'Approximating {} with Monte Carlo simulations'.format(display_name)
+  _,ax=setup_simulation_plot(x_lim=(10,num_itr),y_lim=y_lim,title=r'Approximating {} with Monte Carlo simulations'.format(display_name)
     ,x_label='Iteration',y_label=r'Estimate of {}'.format(display_name))
 
   # perform the simulation
@@ -69,8 +73,16 @@ def run(constant,display_name,actual_value):
     if run==last_run:
       ax=simulation_plot(data,np.arange(num_itr),ax=ax,hline=actual_value,hline_linewidth=1.5,hline_alpha=0.9)
     else:
-      ax=simulation_plot(data,np.arange(num_itr),ax=ax)
+      ax=simulation_plot(data[:,10:],np.arange(10,num_itr),ax=ax)
+
+  # output
+  if verbose:
+    print(r'{} approximately {:.4f}'.format(constant,np.mean(mean)))
+  if save_fig:
+    plt.savefig('{}{}'.format(output_dir,plot_name),dpi=image_res,bbox_inches='tight',pad_inches=0.25)
+  if show_fig:
+    plt.show()
 
 if __name__=='__main__':
   run('e','Euler\'s Number',np.e)
-  # run('pi',r'$\pi$',np.pi)
+  # run('pi',r'$\pi$',np.pi,'pi1')
