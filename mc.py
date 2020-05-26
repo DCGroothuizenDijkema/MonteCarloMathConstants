@@ -14,6 +14,7 @@ import numpy as np
 
 import os
 # you may very well need to change this (I don't really know why it's here, anyway)
+# point it to the directory where any of the dlls your fortran dll depends on
 os.add_dll_directory('C:/bin/mingw-w64/mingw64/bin')
 
 from huygens.interf import c_pointer,c_vector
@@ -46,17 +47,19 @@ def approximate_e(num_itr):
   Parameters
   ----------
   num_itr : int
-    The number of times the counting function should be called.
+    - The number of times the counting function should be called.
 
   Returns
   -------
   means : numpy.ndarray
-    The moving average approximation of Euler's constant.
+    - The moving average approximation of Euler's constant.
 
   '''
+  # setup array to write rolling average to
   means=c_vector(ct.c_double,num_itr)
+  # call library function
   _approximate_e(c_pointer(ct.c_int,num_itr),means)
-  
+  # return as np array
   return np.ctypeslib.as_array(means)
 
 def approximate_pi(num_itr,method='area'):
@@ -65,39 +68,44 @@ def approximate_pi(num_itr,method='area'):
 
   This function uses one of two approximations:
 
-  1. Monte Carlo integration. It randomly picks two numbers in the interval [0,1] (in effect, randomly picking a point in 
+  1. `area`. It randomly picks two numbers in the interval [0,1] (in effect, randomly picking a point in 
   the unit square) and determines if the magnitude of those two numbers is less than one (in effect, if the random point is within the upper
   right-hand corner of the unit circle). pi can then be estimated by the number of points generated which are so within, based on the area
   of the circle and the area of the square, and that the circle has been chosen to have radius one, and therefore have area pi itself.
     Given that the area of the unit square is 1 and the area of the unit circle is pi, the ratio between the former and the upper right-hand
   corner of the latter is 4/pi. This ratio is approximated using the Monte Carlo simulation as the number of points which fall within the
   upper right-hand corner of the unit circle and all points generated. If the former is the `count` and the latter is the `total`, then
-
-  2. 
-
   pi=4*count/total
+
+  2. `chord`. Given two random points on the radius of the circle, 4/pi is the average chord length between these points. Thefore, with 
+  enough pairs of random points generated, pi can be calculaged as the average of 4/d, where d is the chord length between these pairs of
+  points.
 
   Parameters
   ----------
   num_itr : int
-    The number of points to generate in the unit square.
+    - The number of points to generate in the unit square.
   method : string
-    One of 'area' or 'chord'
+    - Which method to use to approximate pi. Must be one of 'area' or 'chord'.
 
   Returns
   -------
   means : numpy.ndarray
-    The moving average approximation of pi.
+    - The moving average approximation of pi.
 
   '''
+  # check method is valid
   methods=['area','chord']
   if method not in methods:
-    raise ValueError('`method` should be one of {}'.format(methods))
+    raise ValueError('`method` must be one of {}'.format(methods))
 
+  # setup array to write rolling average to
   means=c_vector(ct.c_double,num_itr)
+  # call library function
   if method=='area':
     _approximate_pi(c_pointer(ct.c_int,num_itr),means)
   else:
     _approximate_chord_length(c_pointer(ct.c_int,num_itr),means)
   
+  # return as np array
   return np.ctypeslib.as_array(means)
