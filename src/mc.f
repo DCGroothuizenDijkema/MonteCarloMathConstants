@@ -22,7 +22,7 @@ contains
     ! one.
     ! Euler's number is the expected value of this function.
     !
-    ! Returns
+    ! returns
     ! -------
     ! cnt : integer
     !   - The count of random numbers.
@@ -45,7 +45,7 @@ contains
     !
     ! Randomly generate a point in the unit square and determine if it falls within the unit circle.
     !
-    ! Returns
+    ! returns
     ! -------
     ! within : integer
     !   - 1 if the randomly generated point is within the unit circle, 0 otherwise. This should be a logical, but using an integer allows
@@ -72,7 +72,7 @@ contains
     ! Randomly generate a point on the radius of the unit circle, and determine its distance to the point (1,0). This is, 
     ! effectively, the distance between any two random points, as those points could be rotated until one of them was (1,0)
     !
-    ! Returns
+    ! returns
     ! -------
     ! distance : real(kind=8)
     !   - The chord length of two random points on the unit circle.
@@ -89,7 +89,7 @@ contains
     !
     ! Use Monte Carlo simulations to produce successfully more accurate approximations of Euler's number.
     !
-    ! Parameters
+    ! parameters
     ! ----------
     ! n_itr : integer, intent(in)
     !   - The number of simulations to run.
@@ -117,7 +117,7 @@ contains
     !
     ! Use Monte Carlo simulations to produce successfully more accurate approximations of pi.
     !
-    ! Parameters
+    ! parameters
     ! ----------
     ! n_itr : integer, intent(in)
     !   - The number of simulations to run.
@@ -142,7 +142,7 @@ contains
     !
     ! Use Monte Carlo simulations to produce successfully more accurate approximations of pi.
     !
-    ! Parameters
+    ! parameters
     ! ----------
     ! n_itr : integer, intent(in)
     !   - The number of simulations to run.
