@@ -12,12 +12,15 @@
 import ctypes as ct
 import numpy as np
 
+import matplotlib.pyplot as plt
+
 import os
 # you may very well need to change this (I don't really know why it's here, anyway)
 # point it to the directory where any of the dlls your fortran dll depends on
 os.add_dll_directory('C:/bin/mingw-w64/mingw64/bin')
 
 from huygens.interf import c_pointer,c_vector
+from huygens.plotting import simulation_plot,setup_simulation_plot
 
 __all__=['approximate_e','approximate_pi']
 
@@ -36,6 +39,44 @@ _approximate_chord_length.argtypes=[ct.POINTER(ct.c_int),ct.POINTER(ct.c_double)
 _approximate_e.restype=None
 _approximate_pi.restype=None
 _approximate_chord_length.restype=None
+
+def run_and_plot(func,constant,y_lim,display_name,actual_value=None,method=None,num_itr=1000000,num_runs=200,run_size=10,show_fig=False
+  ,save_fig=True,file_name='plot.pdf',dpi=1200,verbose=True):
+
+  assert num_runs%run_size==0, "`num_runs` is not a multiple of `run_size`"
+
+  # setup the method if func requires it
+  if method is not None:
+    approx=lambda x: func(x,method)
+  else: 
+    approx=func
+
+  # get figure and axis to plot on
+  _,ax=setup_simulation_plot(x_lim=(10,num_itr),y_lim=y_lim,title=r'Approximating {} with Monte Carlo simulations'.format(display_name)
+    ,x_label='Iteration',y_label=r'Estimate of {}'.format(display_name))
+
+  # perform the simulation
+  mean=[]
+  data=np.empty((run_size,num_itr))
+  for run in range(int(num_runs/run_size)):
+    for sim in range(run_size):
+      if verbose:
+        print('Run: {}; Sim: {}'.format(run,sim))
+      data[sim,:]=approx(num_itr)
+    # keep track of the means
+    mean.append(np.mean(data[:,-1]))
+    # plot the data
+    ax=simulation_plot(data[:,10:],np.arange(10,num_itr),ax=ax)
+
+  if actual_value is not None:
+    ax=simulation_plot(data,np.arange(num_itr),ax=ax,hline=actual_value,hline_linewidth=1.5,hline_alpha=0.9)
+  # output
+  if verbose:
+    print(r'{} is approximately {:.4f}'.format(constant,np.mean(mean)))
+  if save_fig:
+    plt.savefig('{}'.format(file_name),dpi=dpi,bbox_inches='tight',pad_inches=0.25)
+  if show_fig:
+    plt.show()
 
 def approximate_e(num_itr):
   '''
