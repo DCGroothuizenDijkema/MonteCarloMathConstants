@@ -12,6 +12,10 @@
 import ctypes as ct
 import numpy as np
 
+import os
+# you may very well need to change this (I don't really know why it's here, anyway)
+os.add_dll_directory('C:/bin/mingw-w64/mingw64/bin')
+
 from huygens.interf import c_pointer,c_vector
 
 __all__=['approximate_e','approximate_pi']
@@ -22,12 +26,15 @@ _libc=ct.cdll.LoadLibrary('./bin/mc.dll')
 # extract the functions
 _approximate_e=getattr(_libc,'__monte_carlo_MOD_approximate_e')
 _approximate_pi=getattr(_libc,'__monte_carlo_MOD_approximate_pi')
+_approximate_chord_length=getattr(_libc,'__monte_carlo_MOD_approximate_chord_length')
 
 # assign arg and return types
 _approximate_e.argtypes=[ct.POINTER(ct.c_int),ct.POINTER(ct.c_double)]
 _approximate_pi.argtypes=[ct.POINTER(ct.c_int),ct.POINTER(ct.c_double)]
+_approximate_chord_length.argtypes=[ct.POINTER(ct.c_int),ct.POINTER(ct.c_double)]
 _approximate_e.restype=None
 _approximate_pi.restype=None
+_approximate_chord_length.restype=None
 
 def approximate_e(num_itr):
   '''
@@ -52,18 +59,21 @@ def approximate_e(num_itr):
   
   return np.ctypeslib.as_array(means)
 
-def approximate_pi(num_itr):
+def approximate_pi(num_itr,method='area'):
   '''
   Produce an approximation of pi.
 
-  This function uses Monte Carlo integration. It randomly picks two numbers in the interval [0,1] (in effect, randomly picking a point in 
+  This function uses one of two approximations:
+
+  1. Monte Carlo integration. It randomly picks two numbers in the interval [0,1] (in effect, randomly picking a point in 
   the unit square) and determines if the magnitude of those two numbers is less than one (in effect, if the random point is within the upper
   right-hand corner of the unit circle). pi can then be estimated by the number of points generated which are so within, based on the area
   of the circle and the area of the square, and that the circle has been chosen to have radius one, and therefore have area pi itself.
-
-  Given that the area of the unit square is 1 and the area of the unit circle is pi, the ratio between the former and the upper right-hand
+    Given that the area of the unit square is 1 and the area of the unit circle is pi, the ratio between the former and the upper right-hand
   corner of the latter is 4/pi. This ratio is approximated using the Monte Carlo simulation as the number of points which fall within the
   upper right-hand corner of the unit circle and all points generated. If the former is the `count` and the latter is the `total`, then
+
+  2. 
 
   pi=4*count/total
 
@@ -71,6 +81,8 @@ def approximate_pi(num_itr):
   ----------
   num_itr : int
     The number of points to generate in the unit square.
+  method : string
+    One of 'area' or 'chord'
 
   Returns
   -------
@@ -78,7 +90,14 @@ def approximate_pi(num_itr):
     The moving average approximation of pi.
 
   '''
+  methods=['area','chord']
+  if method not in methods:
+    raise ValueError('`method` should be one of {}'.format(methods))
+
   means=c_vector(ct.c_double,num_itr)
-  _approximate_pi(c_pointer(ct.c_int,num_itr),means)
+  if method=='area':
+    _approximate_pi(c_pointer(ct.c_int,num_itr),means)
+  else:
+    _approximate_chord_length(c_pointer(ct.c_int,num_itr),means)
   
   return np.ctypeslib.as_array(means)
