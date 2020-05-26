@@ -25,8 +25,8 @@ _libc=ct.cdll.LoadLibrary('./bin/mc.dll')
 
 # extract the functions
 _approximate_e=getattr(_libc,'__monte_carlo_MOD_approximate_e')
-_approximate_pi=getattr(_libc,'__monte_carlo_MOD_approximate_pi')
-_approximate_chord_length=getattr(_libc,'__monte_carlo_MOD_approximate_chord_length')
+_approximate_pi=getattr(_libc,'__monte_carlo_MOD_approximate_pi_integration')
+_approximate_chord_length=getattr(_libc,'__monte_carlo_MOD_approximate_pi_chord_length')
 
 # assign arg and return types
 _approximate_e.argtypes=[ct.POINTER(ct.c_int),ct.POINTER(ct.c_double)]
