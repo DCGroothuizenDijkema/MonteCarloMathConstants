@@ -40,6 +40,8 @@ gfortran -c -ffree-form -J./obj/ -o ./obj/mc.o ./src/mc.f
 gfortran -shared -o ./bin/mc.dll ./obj/mc.o
 ```
 
+When using the Python backend, any DLLs which the produced DLL depends on will need to be added to the DLL directory. This can be done with the command ```os.add_dll_directory()```. This is currently done at the top of ```mc.py``` with the directories needed by my own system, and will likely need changing to run.
+
 ## Dependencies
 
 This project uses my huygens Python library, which can he found at <https://github.com/DCGroothuizenDijkema/huygens/>.
