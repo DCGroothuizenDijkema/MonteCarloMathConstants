@@ -21,6 +21,8 @@ The following plot shows an estimation of pi with a different method, and shows 
 
 ![Pi Simulation Results 2](https://drive.google.com/uc?id=1TWZuLV6w2gehAXWA4k4xdBd80sDBFbgE)
 
+Each of the blue lines on the above plot is the moving average of each approximation function in one simulation. Each simulation repeats the experiment 1,000,000 times, and there are 200 simulations. As can be seen, each simulation approaches the true value, given by the solid red line.
+
 ## Building
 
 The library was developed with with [MinGW-w64](http://mingw-w64.org/doku.php), [specifically this version](https://sourceforge.net/projects/mingw-w64/files/Toolchains%20targetting%20Win64/Personal%20Builds/mingw-builds/8.1.0/threads-posix/seh), and can be built with the provided Makefile and nmake, with the following command:
