@@ -21,7 +21,6 @@ clean:
 	-@ if EXIST "./obj/" del /F /Q /S "./obj/" > NUL
 	-@ if EXIST "./obj/" rmdir /Q /S "./obj/"
 
-
 $(TARGET):	$(OBJ)
 	$(F) -shared -o $(TARGET) $(OBJ)
 
