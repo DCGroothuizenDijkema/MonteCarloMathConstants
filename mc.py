@@ -40,45 +40,86 @@ _approximate_e.restype=None
 _approximate_pi.restype=None
 _approximate_chord_length.restype=None
 
-def run_and_plot(func,constant,y_lim,display_name,actual_value=None,method=None,num_itr=1000000,num_runs=200,run_size=10,show_fig=False
+def run_and_plot(func,y_lim,plot_name,print_name=None,actual_value=None,args=(),num_itr=1000000,num_runs=200,batch_size=10,show_fig=False
   ,save_fig=True,file_name='plot.pdf',dpi=1200,verbose=True):
+  '''
+  Produce a plot of the Mandelbrot Set or a Julia Set, coloured by the number of iterations taken.
+  
+  Parameters
+  ----------
+  func : callable
+    - The function to approximate the constant.
+      Should be of the found `func(n,*args).
+  y_lim : (float,float)
+    - The limits of the y-axis of the simulation plot.
+  plot_name : string
+    - The name of the constant to plot with.
+  print_name : string, optional
+    - The name of the constant to output with. Only needed if `verbose` is `True`.
+  actual_value : float, optional
+    - The actual value of the constant being approximated.
+  args : tuple, optional
+    - Arguments to pass onto `func`.
+  num_itr : int, optional
+    - The number of iterations in each simulation.
+  num_runs : int, optional
+    - The number of simulations to run.
+  batch_size : int, optional
+    - The size of each simulation batch, to limit memory usage.
+      `batch_size` must divide `num_runs`.
+  show_fig : bool, optional
+    - If the visualisation should be shown.
+  save_fig : bool, optional
+    - If the visualisation should be saved.
+  file_name : string, optional
+    - The name of the output.
+  dpi : int, optional
+    - Plot resolution.
+  verbose : bool, optional.
+    - For verbose output.
 
-  assert num_runs%run_size==0, "`num_runs` is not a multiple of `run_size`"
+  Returns
+  -------
+  fig : matplotlib.figure.Figure
+    The plot's Figure
+  ax : matplotlib.axes.Axis
+    The Axis of `fig`
 
-  # setup the method if func requires it
-  if method is not None:
-    approx=lambda x: func(x,method)
-  else: 
-    approx=func
+  '''
+  # check valid parameters
+  assert num_runs%batch_size==0, "`num_runs` is not a multiple of `run_size`"
 
   # get figure and axis to plot on
-  _,ax=setup_simulation_plot(x_lim=(10,num_itr),y_lim=y_lim,title=r'Approximating {} with Monte Carlo simulations'.format(display_name)
-    ,x_label='Iteration',y_label=r'Estimate of {}'.format(display_name))
+  fig,ax=setup_simulation_plot(x_lim=(10,num_itr),y_lim=y_lim,title=r'Approximating {} with Monte Carlo simulations'.format(plot_name)
+    ,x_label='Iteration',y_label=r'Estimate of {}'.format(plot_name))
 
   # perform the simulation
   mean=[]
-  data=np.empty((run_size,num_itr))
-  for run in range(int(num_runs/run_size)):
-    for sim in range(run_size):
+  data=np.empty((batch_size,num_itr))
+  for run in range(int(num_runs/batch_size)):
+    for sim in range(batch_size):
       if verbose:
         print('Run: {}; Sim: {}'.format(run,sim))
-      data[sim,:]=approx(num_itr)
+      data[sim,:]=func(num_itr,*args)
     # keep track of the means
     mean.append(np.mean(data[:,-1]))
     # plot the data
     ax=simulation_plot(data[:,10:],np.arange(10,num_itr),ax=ax)
 
+  # plot the actual value, if known
   if actual_value is not None:
     ax=simulation_plot(data,np.arange(num_itr),ax=ax,hline=actual_value,hline_linewidth=1.5,hline_alpha=0.9)
   # output
   if verbose:
-    print(r'{} is approximately {:.4f}'.format(constant,np.mean(mean)))
+    print(r'{} is approximately {:.4f}'.format(print_name,np.mean(mean)))
   if save_fig:
     plt.savefig('{}'.format(file_name),dpi=dpi,bbox_inches='tight',pad_inches=0.25)
   if show_fig:
     plt.show()
 
-def approximate_e(num_itr):
+  return fig,ax
+
+def approximate_e(num_itr,*args):
   '''
   Produce an approximation of Euler's constant.
 
@@ -103,7 +144,7 @@ def approximate_e(num_itr):
   # return as np array
   return np.ctypeslib.as_array(means)
 
-def approximate_pi(num_itr,method='area'):
+def approximate_pi(num_itr,*args):
   '''
   Produce an approximation of pi.
 
@@ -136,9 +177,10 @@ def approximate_pi(num_itr,method='area'):
 
   '''
   # check method is valid
+  method,=args
   methods=['area','chord']
   if method not in methods:
-    raise ValueError('`method` must be one of {}'.format(methods))
+    raise ValueError('`method` must be one of {}, but is {}'.format(methods,method))
 
   # setup array to write rolling average to
   means=c_vector(ct.c_double,num_itr)
