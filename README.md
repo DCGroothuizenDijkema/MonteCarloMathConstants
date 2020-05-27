@@ -17,6 +17,8 @@ The following two visualisations are examples of that made by the programme:
 
 ![Pi Simulation Results 1](https://drive.google.com/uc?id=1TkcqlCxMwO3if65pE84W0tkwlpqd81IF)
 
+The following plot shows an estimation of pi with a different method, and shows a general under estimation of the constant, unless a sufficient number of iterations are used.
+
 ![Pi Simulation Results 2](https://drive.google.com/uc?id=1TWZuLV6w2gehAXWA4k4xdBd80sDBFbgE)
 
 ## Building
